@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-export default function Logo() {
+export const Logo = () => {
   return (
     <Image
       src="/logo-clocker.svg" 
