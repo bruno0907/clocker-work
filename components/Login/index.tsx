@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
 
-import firebase, { persistenceMode } from '../../config/firebase'
+import { firebaseClient, persistenceMode } from '../../config/firebase/client'
 
 import { Logo } from '..'
 
@@ -23,7 +23,8 @@ export const Login = () => {
     password: yup.string().required('A senha obrigatória'),     
   });
 
-  const { values, 
+  const { 
+    values, 
     errors, 
     touched, 
     handleChange, 
@@ -37,11 +38,11 @@ export const Login = () => {
       password: '',      
     },
     onSubmit: async (values, form) => {     
-      firebase.auth().setPersistence(persistenceMode)
+      firebaseClient.auth().setPersistence(persistenceMode)
 
       try {
         const { email, password } = values
-        const user = await firebase.auth()
+        const user = await firebaseClient.auth()
           .signInWithEmailAndPassword(email, password)
 
       } catch(error) {

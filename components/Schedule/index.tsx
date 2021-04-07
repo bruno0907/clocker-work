@@ -4,10 +4,10 @@ import { Container,
   Button 
 } from '@chakra-ui/react'
 
-import firebase from '../../config/firebase'
+import { firebaseClient } from '../../config/firebase/client'
 
 export const Schedule = () => {
-  const handleLogout = () => firebase.auth().signOut()
+  const handleLogout = () => firebaseClient.auth().signOut()
 
   return(
     <Container p={20} centerContent>      

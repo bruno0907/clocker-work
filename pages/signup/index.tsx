@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
 
-import firebase from '../../config/firebase'
+import { firebaseClient } from '../../config/firebase/client'
 
 import { Logo } from '../../components'
 
@@ -42,7 +42,7 @@ export default function Signup() {
     },
     onSubmit: async (values, form) => {
       try {
-        const user = await firebase.auth()
+        const user = await firebaseClient.auth()
           .createUserWithEmailAndPassword(
             values.email, 
             values.password
