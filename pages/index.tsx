@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Center, Spinner } from '@chakra-ui/react'
-import { Login, Appointments } from '../components'
+import { Login, Schedule } from '../components'
 
 import firebase from './../config/firebase'
 
@@ -27,6 +27,6 @@ export default function Home() {
   )}
 
   return userAuth.user 
-    ? <Appointments /> 
+    ? <Schedule /> 
     : <Login />      
 }
