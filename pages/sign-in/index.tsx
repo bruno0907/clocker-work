@@ -1,10 +1,11 @@
+import { useContext } from 'react'
 import Link from 'next/link'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
 
-import { firebaseClient, persistenceMode } from '../../config/firebase/client'
+import { AuthContext } from '../../contexts/AuthContext'
 
-import { Logo } from '..'
+import { Logo } from '../../components'
 
 import { 
   Container, 
@@ -17,7 +18,9 @@ import {
   FormHelperText,
 } from '@chakra-ui/react'
 
-export const Login = () => {
+export default function SignIn(){
+  const { signIn } = useContext(AuthContext)
+
   const validationSchema = yup.object().shape({
     email: yup.string().email('E-mail inválido').required('E-mail obrigatório'),    
     password: yup.string().required('A senha obrigatória'),     
@@ -37,13 +40,10 @@ export const Login = () => {
       email: '',
       password: '',      
     },
-    onSubmit: async (values, form) => {     
-      firebaseClient.auth().setPersistence(persistenceMode)
-
+    onSubmit: (values, form) => {
       try {
         const { email, password } = values
-        const user = await firebaseClient.auth()
-          .signInWithEmailAndPassword(email, password)
+        signIn({ email, password })        
 
       } catch(error) {
         console.log('ERROR: ', error)
@@ -100,7 +100,7 @@ export const Login = () => {
         </form>
       </Box>
       <Box mt={8}>
-        <Link href="/signup">
+        <Link href="/sign-up">
           <a>Ainda não tem uma conta? Cadastre-se!</a>
         </Link>
       </Box>

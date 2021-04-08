@@ -1,32 +1,23 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useContext } from 'react'
+import { useRouter } from 'next/router'
 import { Center, Spinner } from '@chakra-ui/react'
-import { Login, Schedule } from '../components'
 
-import { firebaseClient } from '../config/firebase/client'
+import { AuthContext } from '../contexts/AuthContext'
 
 export default function Home() {
-  const [userAuth, setUserAuth] = useState({
-    loading: true,
-    user: {}
-  })
+  const { userAuth } = useContext(AuthContext)
+  const router = useRouter()
 
   useEffect(() => {
-    firebaseClient.auth().onAuthStateChanged(user => {
-      setUserAuth({
-        loading: false,
-        user
-      })
-    })
-  }, [])
-
-  if(userAuth.loading){
-    return (
+    if(!userAuth.loading){
+      userAuth.user ? router.push('/schedule') : router.push('/sign-in')
+    }
+  }, [userAuth.user])
+  
+  return(    
     <Center height="100%" mt="calc(100vh - 50vh)">
       <Spinner />
-    </Center>
-  )}
-
-  return userAuth.user 
-    ? <Schedule /> 
-    : <Login />      
+    </Center>       
+  )
+  
 }

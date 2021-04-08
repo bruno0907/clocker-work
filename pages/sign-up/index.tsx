@@ -1,8 +1,9 @@
+import { useContext } from 'react'
 import Link from 'next/link'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
 
-import { firebaseClient } from '../../config/firebase/client'
+import { AuthContext } from '../../contexts/AuthContext'
 
 import { Logo } from '../../components'
 
@@ -20,6 +21,8 @@ import {
 } from '@chakra-ui/react'
 
 export default function Signup() {
+  const { signUp } = useContext(AuthContext);
+
   const validationSchema = yup.object().shape({
     email: yup.string().email('E-mail inválido').required('E-mail obrigatório'),    
     password: yup.string().required('A senha obrigatória'),
@@ -40,14 +43,27 @@ export default function Signup() {
       password: '',
       username: ''
     },
-    onSubmit: async (values, form) => {
+    onSubmit: (values, form) => {
       try {
-        const user = await firebaseClient.auth()
-          .createUserWithEmailAndPassword(
-            values.email, 
-            values.password
-          )
-        console.log(user)
+        const { email, password, username } = values        
+
+        const user = signUp({ email, password, username })        
+
+        // firebaseClient.auth().setPersistence(persistenceMode)
+        // await firebaseClient.auth().signInWithEmailAndPassword(email, password)
+        
+        // const { data } = await axios({
+        //   method: 'POST',
+        //   url: '/api/profile',
+        //   headers: {
+        //     'Authentication': `Bearer ${user.getIdToken()}`
+        //   },
+        //   data: {
+        //     username
+        //   }
+        // })
+
+        // console.log(user.getIdToken())
       } catch(error) {
         console.log('ERROR: ', error)
       }

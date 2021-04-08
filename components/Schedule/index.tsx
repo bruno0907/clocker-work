@@ -1,13 +1,15 @@
-import { Logo } from '..'
+import { useContext } from 'react'
+
+import { AuthContext } from '../../contexts/AuthContext'
+
+import { Logo } from '../../components'
 import { Container,   
   Text,
   Button 
 } from '@chakra-ui/react'
 
-import { firebaseClient } from '../../config/firebase/client'
-
 export const Schedule = () => {
-  const handleLogout = () => firebaseClient.auth().signOut()
+  const { signOut } = useContext(AuthContext)
 
   return(
     <Container p={20} centerContent>      
@@ -17,7 +19,7 @@ export const Schedule = () => {
         Agenda
       </Text>      
 
-      <Button mt={16} onClick={handleLogout}>Sair</Button>
+      <Button mt={16} onClick={signOut}>Sair</Button>
     </Container>
   )
 }
