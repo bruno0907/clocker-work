@@ -47,23 +47,8 @@ export default function Signup() {
       try {
         const { email, password, username } = values        
 
-        const user = signUp({ email, password, username })        
-
-        // firebaseClient.auth().setPersistence(persistenceMode)
-        // await firebaseClient.auth().signInWithEmailAndPassword(email, password)
-        
-        // const { data } = await axios({
-        //   method: 'POST',
-        //   url: '/api/profile',
-        //   headers: {
-        //     'Authentication': `Bearer ${user.getIdToken()}`
-        //   },
-        //   data: {
-        //     username
-        //   }
-        // })
-
-        // console.log(user.getIdToken())
+        signUp({ email, password, username })        
+                
       } catch(error) {
         console.log('ERROR: ', error)
       }

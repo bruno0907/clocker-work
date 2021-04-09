@@ -1,5 +1,8 @@
 import React, { useState, useEffect, createContext, ReactNode } from 'react'
 import { useRouter } from 'next/router'
+
+import axios from 'axios'
+
 import { firebaseClient, persistenceMode } from '../config/firebase/client'
 
 interface IUserAuth{
@@ -41,6 +44,9 @@ export const AuthProvider = ({ children }: IAuthProvider) => {
     try {    
       await firebaseClient.auth().signInWithEmailAndPassword(email, password)
       router.push('/schedule')
+
+      return firebaseClient.auth().currentUser
+
     } catch(error) {
       console.log('SIGNIN ERROR: ', error)
     }
@@ -48,10 +54,25 @@ export const AuthProvider = ({ children }: IAuthProvider) => {
   
   const signUp = async ({ email, password, username }: IUser) => {
     try {
-      const { user } = await firebaseClient.auth().createUserWithEmailAndPassword(email, password)
-      await signIn({ email, password })
-      // setupProfile(token, username)
-      console.log('Context SignUp User: ', user)
+      await firebaseClient.auth().createUserWithEmailAndPassword(email, password)
+      const user = await signIn({ email, password })  
+      
+      const token = await user.getIdToken()
+
+      const { data } = await axios({
+        method: 'POST',
+        url: '/api/profile',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        data: {
+          username
+        }
+      })
+
+      console.log(data)
+
+      // setupProfile(token, username)        
   
     } catch (error) {
       console.log('SIGNUP ERROR: ', error)
