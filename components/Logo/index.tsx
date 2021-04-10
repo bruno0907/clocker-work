@@ -1,12 +1,17 @@
 import Image from "next/image";
 
-export const Logo = () => {
+interface ILogo{
+  width?: string;
+  height?: string;
+}
+
+export const Logo = ({ width, height }: ILogo) => {
   return (
     <Image
       src="/logo-clocker.svg" 
       alt="Logo"
-      width={290}
-      height={80}
+      width={width || "280"}      
+      height={height || "90"}      
     />  
   )
 }

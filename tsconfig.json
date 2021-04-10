@@ -19,10 +19,10 @@
     "jsx": "preserve"
   },
   "include": [
-    "next-env.d.ts",
+    "next-env.d.ts",    
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "pages/api/schedule.ts"  ],
   "exclude": [
     "node_modules"
   ]

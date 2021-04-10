@@ -1,9 +1,11 @@
 
 import { AppProps } from 'next/app'
 import Head from 'next/head'
+
 import { ChakraProvider } from '@chakra-ui/react'
-import '../styles/globals.css'
 import { AuthProvider } from '../contexts/AuthContext'
+
+import '../styles/globals.css'
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
