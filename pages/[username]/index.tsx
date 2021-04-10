@@ -13,7 +13,7 @@ import { Container,
   Box,
   IconButton,  
   SimpleGrid,
-  Spinner
+  Spinner  
 } from '@chakra-ui/react'
 
 import { ChevronLeftIcon, ChevronRightIcon} from '@chakra-ui/icons'
@@ -49,8 +49,8 @@ export default function Schedule(){
       },           
     })
     .then(({ data }) => {
-      setAvailableHours(data)
-      setLoading(false)
+      setAvailableHours(data)      
+      setLoading(false)      
     })
     .catch(e => console.log(e.messasge))
 
@@ -78,9 +78,9 @@ export default function Schedule(){
           bg="transparen"
           onClick={nextDay}
         />
-      </Box>      
-      <SimpleGrid padding={4} columns={2} gap={4} w="100%">
-        { loading && 
+      </Box> 
+      { loading 
+        ? <Box p={4} alignItems="center" justifyContent="center">
             <Spinner 
               tickness="4px" 
               speed="0.65s" 
@@ -88,9 +88,11 @@ export default function Schedule(){
               color="blue.500" 
               size="xl"
             />
-        }
-        { availableHours.timeBlocks.map((hour) => <HourButton hour={hour} />)}
-      </SimpleGrid>      
+          </Box>
+        : <SimpleGrid p={4} columns={2} gap={4} w="100%" alignItems="center" justifyContent="center">
+            { availableHours?.timeBlocks.map(hour => <HourButton key={hour} hour={hour} />)}
+          </SimpleGrid> 
+      }           
     </Container>     
   )
 }
