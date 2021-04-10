@@ -22,7 +22,7 @@
     "next-env.d.ts",    
     "**/*.ts",
     "**/*.tsx"
-, "pages/api/schedule.ts"  ],
+, "pages/api/appointments.ts"  ],
   "exclude": [
     "node_modules"
   ]

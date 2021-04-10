@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }: IAuthProvider) => {
   
     try {    
       await firebaseClient.auth().signInWithEmailAndPassword(email, password)
-      router.push('/schedule')
+      router.push('/appointments')
 
       return firebaseClient.auth().currentUser
 

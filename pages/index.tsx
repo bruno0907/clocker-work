@@ -10,7 +10,7 @@ export default function Home() {
 
   useEffect(() => {
     if(!userAuth.loading){
-      userAuth.user ? router.push('/schedule') : router.push('/sign-in')
+      userAuth.user ? router.push('/appointments') : router.push('/sign-in')
     }
   }, [userAuth.user])
   

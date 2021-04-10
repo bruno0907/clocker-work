@@ -3,15 +3,23 @@ import { firebaseServer } from '../../config/firebase/server'
 
 const db = firebaseServer.firestore()
 const schedule = db.collection('schedule')
-const profile = db.collection('profile')
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {    
+export default async (req: NextApiRequest, res: NextApiResponse) => {  
+  const { authorization } = req.headers   
+  
+  if(!authorization) return res.status(401)
+  
   const { when } = req.query
-  const { username } = req.query
+
+  if(!when) return res.status(401)
+
+  const token = authorization.replace('Bearer ', '') 
+  
+  const { user_id } = await firebaseServer.auth().verifyIdToken(token)
 
   try{ 
     const snapshot = await schedule
-      .where('username', '==', username)
+      .where('user_id', '==', user_id)
       .where('when', '==', when)
       .get()
 
