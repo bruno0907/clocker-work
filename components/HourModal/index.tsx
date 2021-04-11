@@ -1,6 +1,14 @@
+import { useRouter } from 'next/router'
+
+import { useFormik } from 'formik'
+import * as yup from 'yup'
+
+import axios from 'axios'
+
 import { Input } from '../'
 
-import { Button, 
+import { 
+  Button,   
   Modal, 
   ModalBody, 
   ModalCloseButton, 
@@ -8,36 +16,58 @@ import { Button,
   ModalFooter, 
   ModalHeader, 
   ModalOverlay,   
-  Stack,
-  InputGroup,
-  InputLeftElement,
-  FormLabel,
-  FormControl,  
+  Stack,    
 } from '@chakra-ui/react'
 
-import { PhoneIcon, } from '@chakra-ui/icons'
-
-import { useFormik } from 'formik'
-import * as yup from 'yup'
+interface ISchedule{
+  name: string;
+  phoneNumber: string;
+  when: string
+}
 
 export const HourModal = ({ isOpen, onClose, hour }) => {
+  const router = useRouter()  
+  
+  const setSchedule = async (data: ISchedule) => {
+    const { username } = router.query    
+    
+    await axios({
+      method: 'POST',
+      url: 'api/schedule',      
+      data: {
+        ...data,
+        username
+      }
+    })
+    .then(() => {
+      resetForm()
+      onClose()
+    }).catch(error => console.log(error.message))
+  }
+
+
   const validationSchema = yup.object().shape({
     name: yup.string().required('Campo obrigatório'),
     phoneNumber: yup.string().required('Campo obrigatório')
   })
 
-  const { values, handleChange, handleSubmit, errors, touched, handleBlur } = useFormik({
+  const { values, handleChange, handleSubmit, errors, touched, handleBlur, resetForm,  } = useFormik({
     initialValues: {
       name: '',
       phoneNumber: ''
     },
     validationSchema: validationSchema,
-    onSubmit: () => console.log(values)
+    onSubmit: (values) => setSchedule({ ...values, when: hour }),
     
   })     
 
+  const handleModalOnClose = () => {
+    resetForm()
+    return onClose()
+  }
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={handleModalOnClose}>
       <ModalOverlay />
       <ModalContent>
         <form onSubmit={handleSubmit}>
@@ -69,16 +99,14 @@ export const HourModal = ({ isOpen, onClose, hour }) => {
               />
             </Stack>
           </ModalBody>
-
-          <ModalFooter>
-            <Button variant="outline" mr={3} onClick={onClose}>Cancelar</Button>
+          <ModalFooter>            
+            <Button variant="outline" mr={3} onClick={handleModalOnClose}>Cancelar</Button>
             <Button colorScheme="blue" type="submit">
               Agendar horário
-            </Button>
-          </ModalFooter>
+            </Button>            
+          </ModalFooter>          
         </form>
       </ModalContent>
     </Modal>    
-  )
-  
+  )  
 }
