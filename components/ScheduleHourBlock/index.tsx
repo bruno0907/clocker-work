@@ -5,7 +5,7 @@ import * as yup from 'yup'
 
 import axios from 'axios'
 
-import { Input } from '../'
+import { Input } from '..'
 
 import { 
   Button,   
@@ -17,18 +17,45 @@ import {
   ModalHeader, 
   ModalOverlay,   
   Stack,    
+  useDisclosure
 } from '@chakra-ui/react'
 
-interface ISchedule{
+interface IScheduleData{
   name: string;
   phoneNumber: string;
-  when: string
+  when: string  
 }
 
-export const HourModal = ({ isOpen, onClose, hour }) => {
+interface IScheduleHourBlock{
+  hour: string;
+  date: Date;
+}
+
+export const ScheduleHourBlock = ({ hour, date }: IScheduleHourBlock) => {  
   const router = useRouter()  
-  
-  const setSchedule = async (data: ISchedule) => {
+  const { isOpen, onOpen, onClose } = useDisclosure()    
+
+  const validationSchema = yup.object().shape({
+    name: yup.string().required('Campo obrigatório'),
+    phoneNumber: yup.string().required('Campo obrigatório')
+  })
+
+  const { values, handleChange, handleSubmit, errors, touched, handleBlur, resetForm, isSubmitting } = useFormik({
+    initialValues: {
+      name: '',
+      phoneNumber: ''
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values) => setSchedule({ ...values, when: hour }),    
+    
+  })     
+
+  const handleModalOnClose = () => {
+    resetForm()
+    return onClose()
+  }
+
+  const setSchedule = async (data: IScheduleData) => {
     const { username } = router.query    
     
     await axios({
@@ -39,35 +66,31 @@ export const HourModal = ({ isOpen, onClose, hour }) => {
         username
       }
     })
-    .then(() => {
+    .then(response => {
+      console.log(response)
       resetForm()
-      onClose()
-    }).catch(error => console.log(error.message))
+      onClose()      
+      router.reload()
+    }).catch(
+      error => {
+        console.log(error.message)  
+        alert(`O horário das ${hour} já foi agendado. Tente outro horário.`) 
+        resetForm()     
+        onClose()
+      }
+    )
   }
 
-
-  const validationSchema = yup.object().shape({
-    name: yup.string().required('Campo obrigatório'),
-    phoneNumber: yup.string().required('Campo obrigatório')
-  })
-
-  const { values, handleChange, handleSubmit, errors, touched, handleBlur, resetForm,  } = useFormik({
-    initialValues: {
-      name: '',
-      phoneNumber: ''
-    },
-    validationSchema: validationSchema,
-    onSubmit: (values) => setSchedule({ ...values, when: hour }),
-    
-  })     
-
-  const handleModalOnClose = () => {
-    resetForm()
-    return onClose()
-  }
-
-  return (
-    <Modal isOpen={isOpen} onClose={handleModalOnClose}>
+  return(
+    <>
+      <Button p={8} colorScheme="blue" onClick={onOpen}>
+        {hour}
+      </Button>
+      
+      <Modal 
+      isOpen={isOpen} 
+      onClose={handleModalOnClose}      
+    >
       <ModalOverlay />
       <ModalContent>
         <form onSubmit={handleSubmit}>
@@ -85,6 +108,7 @@ export const HourModal = ({ isOpen, onClose, hour }) => {
                 onBlur={handleBlur}
                 error={errors.name}
                 isRequired
+                disabled={isSubmitting}
               />
               <Input
                 type="tel"
@@ -96,17 +120,19 @@ export const HourModal = ({ isOpen, onClose, hour }) => {
                 onBlur={handleBlur}
                 error={errors.phoneNumber}
                 isRequired
+                disabled={isSubmitting}
               />
             </Stack>
           </ModalBody>
           <ModalFooter>            
             <Button variant="outline" mr={3} onClick={handleModalOnClose}>Cancelar</Button>
-            <Button colorScheme="blue" type="submit">
+            <Button colorScheme="blue" type="submit" isLoading={isSubmitting}>
               Agendar horário
             </Button>            
           </ModalFooter>          
         </form>
       </ModalContent>
-    </Modal>    
-  )  
+    </Modal>  
+    </>
+  )
 }

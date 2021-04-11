@@ -1,6 +1,5 @@
 export * from './Logo'
 export * from './Header'
 export * from './Date'
-export * from './HourButton'
-export * from './HourModal'
+export * from './ScheduleHourBlock'
 export * from './Input'

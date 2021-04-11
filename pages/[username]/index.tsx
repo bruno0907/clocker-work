@@ -5,7 +5,7 @@ import { addDays, subDays } from 'date-fns'
 
 import axios from 'axios'
 
-import { Logo, Header, formatDate, HourButton } from '../../components'
+import { Logo, Header, formatDate, ScheduleHourBlock } from '../../components'
 
 import { Container,   
   Text,
@@ -88,7 +88,7 @@ export default function Schedule(){
             />
           </Box>
         : <SimpleGrid p={4} columns={2} gap={4} w="100%" alignItems="center" justifyContent="center">
-            { availableHours?.timeBlocks.map(hour => <HourButton key={hour} hour={hour} />)}
+            { availableHours?.timeBlocks.map(hour => <ScheduleHourBlock key={hour} hour={hour} date={when} />)}
           </SimpleGrid> 
       }           
     </Container>     
