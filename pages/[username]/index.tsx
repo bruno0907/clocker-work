@@ -38,9 +38,9 @@ export default function Schedule(){
   const currentDay = formatDate(when, 'PPPP')
 
   useEffect(() => { 
-    if(!username) return
+    if(!username) return 
 
-    const schedule = axios({
+    axios({
       method: 'GET',
       url: '/api/schedule',
       params: { 
@@ -52,9 +52,7 @@ export default function Schedule(){
       setAvailableHours(data)      
       setLoading(false)      
     })
-    .catch(e => console.log(e.messasge))
-
-    console.log(availableHours)
+    .catch(error => console.log(error.message))    
     
   }, [when, username])  
      

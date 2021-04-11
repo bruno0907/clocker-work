@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useCallback, useMemo } from 'react'
+import { useContext, useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
 
 import { addDays, subDays } from 'date-fns'
@@ -26,44 +26,39 @@ export default function Appointments(){
 
   const [appointments, setAppointments] = useState<[]>([])
   const [when, setWhen] = useState<Date>(() => new Date())  
-
-  const getAppointments = async( when: Date ) => {
-    const token = await getToken()
   
-    const { data } = await axios({
-      method: 'GET',
-      url: '/api/appointments',
-      params: { when },
-      headers: { Authorization: `Bearer ${token}` },      
-    })
-    setAppointments(data)     
-  }   
-
-  // const nextDay = useCallback(() => {
-  //   setWhen(prevState => addDays(prevState, 1))
-  //   getAppointments(when)
-
-  // }, [when])
-
-  // const previousDay = useCallback(() => {
-  //   setWhen(prevState => subDays(prevState, 1))
-  //   getAppointments(when)
-
-  // }, [when])
-
   const previousDay = () => setWhen(prevState => subDays(prevState, 1))
   const nextDay = () => setWhen(prevState => addDays(prevState, 1))
 
   const currentDay = formatDate(when, 'PPPP')
+  
+  const getAppointments = async(when: Date) => {
+    const token = await getToken()
+
+    try{    
+      const response = await axios({
+        method: 'GET',
+        url: '/api/appointments',
+        params: { when },
+        headers: { Authorization: `Bearer ${token}` },      
+      })
+  
+      return { response, token }
+
+    } catch(error){
+      return console.log(error.message)
+    }
+  }
 
   useMemo(() => {
     getAppointments(when)
+
   }, [when])
 
   useEffect(() => {
-    !userAuth.user && router.push('/')    
-    
-  }, [userAuth.user])  
+    !userAuth.user && router.push('/')      
+
+  }, [userAuth.user, when])  
      
   return(
     <Container p={20} centerContent> 
@@ -88,7 +83,7 @@ export default function Appointments(){
       </Box>
       <Box mt={16}>
         <Text>
-          Agenda
+          Agenda de atendimentos
         </Text>
       </Box>
     </Container>     

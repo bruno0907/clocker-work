@@ -72,23 +72,17 @@ const getSchedule = async (req: NextApiRequest, res: NextApiResponse) => {
   const { username } = req.query  
   
   try{ 
-    //     // const profileDoc = await profile
-    //     //   .where('username', '==', username)
-    //     //   .get()
-    
-    //     // console.log('Profile Doc', profileDoc)    
-    
-    //     // const snapshot = await appointments
-    //     //   .where('user_id', '==', profileDoc)
-    //     //   .where('when', '==', when)
-    //     //   .get()   
+    const profileDoc = await profile
+      .where('username', '==', username)
+      .get()  
+
+    const doc = profileDoc.docs[0].data()
 
 
     return res.status(200).json({
-      when,
-      username,
+      doc,
       timeBlocks
-    })
+    })  
 
   } catch(error) {
       console.log('FB ERROR: ', error.message)
