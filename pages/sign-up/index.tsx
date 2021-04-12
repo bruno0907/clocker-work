@@ -43,16 +43,10 @@ export default function Signup() {
       password: '',
       username: ''
     },
-    onSubmit: (values, form) => {
-      try {
-        const { email, password, username } = values        
-
-        signUp({ email, password, username })        
-                
-      } catch(error) {
-        console.log('ERROR: ', error)
-      }
-    }
+    onSubmit: values => {      
+      const { email, password, username } = values 
+      signUp({ email, password, username })        
+    }    
   })  
 
   return (

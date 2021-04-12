@@ -48,18 +48,19 @@ export const AuthProvider = ({ children }: IAuthProvider) => {
       return firebaseClient.auth().currentUser
 
     } catch(error) {
-      console.log('SIGNIN ERROR: ', error)
+      alert('Usuário ou senha inválidos')
+      router.push('/sign-in')
     }
   }
   
-  const signUp = async ({ email, password, username }: IUser) => {
+  const signUp = async({ email, password, username }: IUser) => {
     try {
       await firebaseClient.auth().createUserWithEmailAndPassword(email, password)
       const user = await signIn({ email, password })  
       
       const token = await user.getIdToken()
 
-      const { data } = await axios({
+      await axios({
         method: 'POST',
         url: '/api/profile',
         headers: {
@@ -68,14 +69,10 @@ export const AuthProvider = ({ children }: IAuthProvider) => {
         data: {
           username
         }
-      })
-
-      console.log(data)
-
-      // setupProfile(token, username)        
+      })              
   
     } catch (error) {
-      console.log('SIGNUP ERROR: ', error)
+      console.log(error)
     }
   }
   
@@ -92,7 +89,7 @@ export const AuthProvider = ({ children }: IAuthProvider) => {
       })
     })
 
-    return() => unsubscribe()
+    return () => unsubscribe()
   }, [])
 
   return(

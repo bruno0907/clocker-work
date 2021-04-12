@@ -5,15 +5,15 @@ import { addDays, subDays, format } from 'date-fns'
 
 import axios from 'axios'
 
-import { Logo, Header, formatDate, ScheduleHourBlock } from '../../components'
+import { Logo, Header, formatDate, ScheduleHourBlock, Loading } from '../../components'
 
-import { Container,   
+import { 
+  Container,   
   Text,
   Button,
   Box,
   IconButton,  
-  SimpleGrid,
-  Spinner  
+  SimpleGrid
 } from '@chakra-ui/react'
 
 import { ChevronLeftIcon, ChevronRightIcon} from '@chakra-ui/icons'
@@ -68,7 +68,8 @@ export default function Schedule(){
   return(
     <Container centerContent p={10}> 
       <Header>
-        <Logo width="150" height="40" />                
+        <Logo width="150" height="40"/>        
+        <Button onClick={() => router.push('/sign-in')}>Entrar</Button>
       </Header>
       <Box mt={16} w="100%" display="flex" alignItems="center" justifyContent="space-between">     
         <IconButton 
@@ -86,15 +87,7 @@ export default function Schedule(){
         />
       </Box> 
       { loading
-        ? <Box p={4} mt={8} alignItems="center" justifyContent="center">
-            <Spinner 
-              tickness="4px" 
-              speed="0.65s" 
-              emptyColor="gray.200" 
-              color="blue.500" 
-              size="xl"
-            />
-          </Box>
+        ? <Loading />
         : <SimpleGrid mt={8} p={4} columns={2} gap={4} w="100%" alignItems="center" justifyContent="center">
             { availableHours.result.map(({ hour, isBooked }) => <ScheduleHourBlock key={hour} hour={hour} date={when} isBooked={isBooked}/>)}
           </SimpleGrid>

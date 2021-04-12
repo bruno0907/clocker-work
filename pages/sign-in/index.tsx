@@ -40,14 +40,9 @@ export default function SignIn(){
       email: '',
       password: '',      
     },
-    onSubmit: (values, form) => {
-      try {
-        const { email, password } = values
-        signIn({ email, password })        
-
-      } catch(error) {
-        console.log('ERROR: ', error)
-      }
+    onSubmit: values => {      
+      const { email, password } = values
+      signIn({ email, password })
     }
   }) 
 

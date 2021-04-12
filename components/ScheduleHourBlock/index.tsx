@@ -69,13 +69,11 @@ export const ScheduleHourBlock = ({ hour, date, isBooked }: IScheduleHourBlock) 
         username
       }
     })
-    .then(response => {
-      console.log(response)
+    .then(() => {      
       resetForm()
-      onClose()            
-    }).catch(
-      error => {
-        console.log(error.message)  
+      onClose()
+      router.reload()            
+    }).catch(() => {          
         alert(`O horário das ${hour} já foi agendado. Tente outro horário.`) 
         resetForm()     
         onClose()

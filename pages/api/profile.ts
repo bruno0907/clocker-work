@@ -22,8 +22,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(201).json(userProfile)
 
   } catch(error) {
-    console.log('ERROR ', error.message)
-
     return res.status(500).json({
       error: error.message
     })
