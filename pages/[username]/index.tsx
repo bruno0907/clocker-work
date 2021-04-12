@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
-import { addDays, subDays } from 'date-fns'
+import { addDays, subDays, format } from 'date-fns'
 
 import axios from 'axios'
 
@@ -21,7 +21,10 @@ import { ChevronLeftIcon, ChevronRightIcon} from '@chakra-ui/icons'
 interface IAvailableHours{
   when: Date,
   username: string;
-  timeBlocks: [string]
+  result: [{
+    hour: string;
+    isBooked: boolean;
+  }]
 }
 
 export default function Schedule(){    
@@ -39,28 +42,33 @@ export default function Schedule(){
 
   useEffect(() => { 
     if(!username) return 
-
-    axios({
-      method: 'GET',
-      url: '/api/schedule',
-      params: { 
-        when, 
-        username 
-      },           
-    })
-    .then(({ data }) => {
-      setAvailableHours(data)      
-      setLoading(false)      
-    })
-    .catch(error => console.log(error.message))    
     
-  }, [when, username])  
-     
+    const getSchedule = async() => {
+      setLoading(true)
+      
+      axios({
+        method: 'GET',
+        url: '/api/schedule',
+        params: { 
+          date: format(when, 'yyyy-MM-dd'), 
+          username 
+        },           
+      }).then(({ data }) => {
+        setAvailableHours(data)      
+        setLoading(false)      
+      }).catch(() => {      
+        alert('Usuário não encontrado')
+        router.push('/')
+      })    
+    }
+    getSchedule()
+    
+  }, [when, username])    
+  
   return(
     <Container centerContent p={10}> 
       <Header>
-        <Logo width="150" height="40"/>        
-        <Button onClick={() => router.push('/')}>Sair</Button>
+        <Logo width="150" height="40" />                
       </Header>
       <Box mt={16} w="100%" display="flex" alignItems="center" justifyContent="space-between">     
         <IconButton 
@@ -77,8 +85,8 @@ export default function Schedule(){
           onClick={nextDay}
         />
       </Box> 
-      { loading 
-        ? <Box p={4} alignItems="center" justifyContent="center">
+      { loading
+        ? <Box p={4} mt={8} alignItems="center" justifyContent="center">
             <Spinner 
               tickness="4px" 
               speed="0.65s" 
@@ -87,10 +95,13 @@ export default function Schedule(){
               size="xl"
             />
           </Box>
-        : <SimpleGrid p={4} columns={2} gap={4} w="100%" alignItems="center" justifyContent="center">
-            { availableHours?.timeBlocks.map(hour => <ScheduleHourBlock key={hour} hour={hour} date={when} />)}
-          </SimpleGrid> 
-      }           
+        : <SimpleGrid mt={8} p={4} columns={2} gap={4} w="100%" alignItems="center" justifyContent="center">
+            { availableHours.result.map(({ hour, isBooked }) => <ScheduleHourBlock key={hour} hour={hour} date={when} isBooked={isBooked}/>)}
+          </SimpleGrid>
+      }      
+      <Box mt={8}>
+        <Text>Copyright 2021 - Blabla</Text>
+      </Box>     
     </Container>     
   )
 }

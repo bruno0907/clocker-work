@@ -11,7 +11,8 @@ export const Logo = ({ width, height }: ILogo) => {
       src="/logo-clocker.svg" 
       alt="Logo"
       width={width || "280"}      
-      height={height || "90"}      
+      height={height || "90"}   
+      priority  
     />  
   )
 }

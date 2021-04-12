@@ -19,12 +19,14 @@ for(let blockIndex = 0; blockIndex <= totalHours; blockIndex++){
   timeBlocks.push(time)
 }
 
-const getUserId = async (username: string) => {
+const getUserId = async (username: string | string[]) => {
   const profileDoc = await profile
     .where('username', '==', username)
     .get()
+
+  if(!profileDoc.docs.length) return false
   
-  const { user_id } = profileDoc.docs[0].data()
+  const { user_id } = profileDoc.docs[0].data()  
 
   return user_id
 }
@@ -34,59 +36,67 @@ const setSchedule = async (req: NextApiRequest, res: NextApiResponse) => {
     username, 
     name, 
     phoneNumber, 
-    when 
+    hour,
+    date 
   } = req.body
 
-  try{
-    const user_id = await getUserId(username)
+  try {
+    const user_id = await getUserId(username)    
 
-    if(!user_id) return res.status(400).json({
-      message: 'User not found'
-    })
+    const docId = `${user_id}#${date}#${hour}`
 
-    const hasAppointments = await appointments.doc(`${user_id}#${when}`).get()
+    const hasAppointments = await appointments.doc(docId).get()
   
     if(hasAppointments.exists) return res.status(400).json({
       message: 'Appointment hour not available!'
     })
   
-    const appointment = await appointments.doc(`${user_id}#${when}`).set({
+    const appointment = await appointments.doc(docId).set({
       user_id,
-      when,
+      date,
+      hour,
       name,
       phoneNumber
     })
   
     return res.status(201).json(appointment)
 
-  } catch(error){
-    return res.status(500).json({
-      error: error.message
-    })
+  } catch(error) {
+    return res.status(500).json({ error: error.message })
+
   }
 
 }
 
 const getSchedule = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { when } = req.query
-  const { username } = req.query  
+  const { username } = req.query    
+  const { date } = req.query
   
-  try{ 
-    const profileDoc = await profile
-      .where('username', '==', username)
-      .get()  
+  try { 
+    const user_id = await getUserId(username)    
 
-    const doc = profileDoc.docs[0].data()
+    if(!user_id) throw new Error('User not found')
 
+    const snapshot = await appointments
+      .where('user_id', '==', user_id)
+      .where('date', '==', date)
+      .get()    
+
+    const dates = snapshot.docs.map(doc => doc.data())
+
+    const result = timeBlocks.map(hour => ({
+      hour,
+      isBooked: !!dates.find(date => date.hour === hour)
+    }))    
 
     return res.status(200).json({
-      doc,
-      timeBlocks
+      user_id,
+      result,      
     })  
 
-  } catch(error) {
-      console.log('FB ERROR: ', error.message)
-      return res.status(500)
+  } catch(error) {      
+      return res.status(500).json({ error: error.message })
+
   }  
 }
 

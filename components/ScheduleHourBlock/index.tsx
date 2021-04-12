@@ -5,6 +5,8 @@ import * as yup from 'yup'
 
 import axios from 'axios'
 
+import { format } from 'date-fns'
+
 import { Input } from '..'
 
 import { 
@@ -20,18 +22,20 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 
-interface IScheduleData{
-  name: string;
-  phoneNumber: string;
-  when: string  
-}
-
 interface IScheduleHourBlock{
   hour: string;
   date: Date;
+  isBooked: boolean;
 }
 
-export const ScheduleHourBlock = ({ hour, date }: IScheduleHourBlock) => {  
+interface IScheduleData{
+  name: string;
+  phoneNumber: string;
+  hour: string;
+  date: Date;  
+}
+
+export const ScheduleHourBlock = ({ hour, date, isBooked }: IScheduleHourBlock) => {  
   const router = useRouter()  
   const { isOpen, onOpen, onClose } = useDisclosure()    
 
@@ -46,31 +50,29 @@ export const ScheduleHourBlock = ({ hour, date }: IScheduleHourBlock) => {
       phoneNumber: ''
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => setSchedule({ ...values, when: hour }),    
-    
+    onSubmit: (values) => setSchedule({ 
+      ...values, 
+      hour,
+      date
+    }), 
   })     
 
-  const handleModalOnClose = () => {
-    resetForm()
-    return onClose()
-  }
-
-  const setSchedule = async (data: IScheduleData) => {
+  const setSchedule = async({ date, ...data }: IScheduleData) => {
     const { username } = router.query    
     
     await axios({
       method: 'POST',
       url: 'api/schedule',      
       data: {
-        ...data,
+        ...data,       
+        date: format(date, 'yyyy-MM-dd'),
         username
       }
     })
     .then(response => {
       console.log(response)
       resetForm()
-      onClose()      
-      router.reload()
+      onClose()            
     }).catch(
       error => {
         console.log(error.message)  
@@ -81,58 +83,65 @@ export const ScheduleHourBlock = ({ hour, date }: IScheduleHourBlock) => {
     )
   }
 
+  const handleModalClose = () => {
+    resetForm()
+    return onClose()
+  }
+
   return(
     <>
-      <Button p={8} colorScheme="blue" onClick={onOpen}>
+      <Button p={8} colorScheme="blue" onClick={onOpen} disabled={isBooked}>
         {hour}
       </Button>
-      
-      <Modal 
-      isOpen={isOpen} 
-      onClose={handleModalOnClose}      
-    >
-      <ModalOverlay />
-      <ModalContent>
-        <form onSubmit={handleSubmit}>
-          <ModalHeader>Horário: {hour}</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Stack spacing={4}>              
-              <Input
-                type="text"
-                label="Nome completo:"
-                name="name"
-                touched={touched.name}
-                value={values.name}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={errors.name}
-                isRequired
-                disabled={isSubmitting}
-              />
-              <Input
-                type="tel"
-                label="Telefone de contato:"
-                name="phoneNumber"
-                touched={touched.phoneNumber}
-                value={values.phoneNumber}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={errors.phoneNumber}
-                isRequired
-                disabled={isSubmitting}
-              />
-            </Stack>
-          </ModalBody>
-          <ModalFooter>            
-            <Button variant="outline" mr={3} onClick={handleModalOnClose}>Cancelar</Button>
-            <Button colorScheme="blue" type="submit" isLoading={isSubmitting}>
-              Agendar horário
-            </Button>            
-          </ModalFooter>          
-        </form>
-      </ModalContent>
-    </Modal>  
+      {!isBooked &&
+        <Modal isOpen={isOpen} onClose={handleModalClose} isCentered>
+          <ModalOverlay />
+          <ModalContent>
+            <form onSubmit={handleSubmit}>
+              <ModalHeader>Horário: {hour}</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <Stack spacing={4}>              
+                  <Input
+                    type="text"
+                    label="Nome completo:"
+                    name="name"
+                    touched={touched.name}
+                    value={values.name}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={errors.name}
+                    isRequired
+                    disabled={isSubmitting}
+                    mask=""
+                  />
+                  <Input
+                    type="tel"
+                    label="Telefone de contato:"
+                    name="phoneNumber"
+                    touched={touched.phoneNumber}
+                    value={values.phoneNumber}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={errors.phoneNumber}
+                    isRequired
+                    disabled={isSubmitting}
+                    placeholder="(99) 9 9999-9999"
+                    mask={["(99) 9999-9999", "(99) 9 9999-9999"]}
+                    
+                  />
+                </Stack>
+              </ModalBody>
+              <ModalFooter>            
+                <Button variant="outline" mr={3} onClick={handleModalClose}>Cancelar</Button>
+                <Button colorScheme="blue" type="submit" isLoading={isSubmitting}>
+                  Agendar horário
+                </Button>            
+              </ModalFooter>          
+            </form>
+          </ModalContent>
+        </Modal>  
+      }
     </>
   )
 }

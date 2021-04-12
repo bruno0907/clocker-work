@@ -1,12 +1,9 @@
-import { Button, 
-  Modal, 
-  ModalBody, 
-  ModalCloseButton, 
-  ModalContent, 
-  ModalFooter, 
-  ModalHeader, 
-  ModalOverlay,   
-  Stack,
+import { ChangeEvent } from 'react'
+
+// @ts-ignore
+import { mask, unMask } from 'remask'
+
+import { 
   InputGroup,
   InputLeftElement,
   FormLabel,
@@ -17,7 +14,16 @@ import { Button,
 
 import { PhoneIcon, EmailIcon } from '@chakra-ui/icons'
 
-export const Input = ({ type, error, touched, label, ...props }) => {
+export const Input = ({ type, error, touched, label, onChange, mask: pattern, ...props }) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target  
+    
+    const unMaskedValue = unMask(value)
+    const maskedValue = mask(unMaskedValue, pattern)
+
+    onChange && onChange(name)(maskedValue)
+  }
+
   return(
     <FormControl id={props.name} isRequired={props.isRequired}>
       <FormLabel>{label}</FormLabel>
@@ -34,7 +40,7 @@ export const Input = ({ type, error, touched, label, ...props }) => {
             children={<EmailIcon color="gray.300" />}
           />
         }
-        <Inputbase {...props} />    
+        <Inputbase {...props} onChange={pattern ? handleChange : onChange} />    
       </InputGroup>
       {touched && <FormHelperText textColor="#E74C3C">{error}</FormHelperText>}          
     </FormControl>
