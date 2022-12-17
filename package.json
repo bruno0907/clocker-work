@@ -13,7 +13,7 @@
     "@emotion/react": "^11.1.5",
     "@emotion/styled": "^11.1.5",
     "@refetty/react": "^1.0.0-rc.12",
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "date-fns": "^2.20.1",
     "firebase": "^8.3.2",
     "firebase-admin": "^9.6.0",
